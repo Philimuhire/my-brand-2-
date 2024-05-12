@@ -46,11 +46,11 @@
             </div>
         </div>
         <div class="contact-form">
-            <form action="">
-                <input type="" placeholder="Enter your name" required>
-                <input type="email" placeholder="Enter your email" required>
-                <input type="" placeholder="Enter the subject">
-                <textarea name="" id="" cols="30" rows="10" placeholder="Enter your message" required></textarea>
+            <form id="contact-form">
+                <input type="" id="name" placeholder="Enter your name" required>
+                <input type="email" id="email" placeholder="Enter your email" required>
+                <input type="" id="subject" placeholder="Enter the subject">
+                <textarea name="" id="message" cols="30" rows="10" placeholder="Enter your message" required></textarea>
                 <input type="submit" value="Send" class="send">
             </form>
         </div>
@@ -60,6 +60,44 @@
         <p>Developed by Philbert Muhire &copy; 2024</p>
     </div>
     <a href="#" class="top"><i class='bx bx-up-arrow-alt'></i></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('contact-form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+
+                try {
+                    const response = await fetch('http://localhost:5000/contact/saveContactQuery', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            subject: subject,
+                            message: message
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert('Your query has been submitted successfully!');
+                    } else {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Failed to submit query');
+                    }
+                } catch (error) {
+                    console.error('Error submitting query:', error);
+                    alert('Failed to submit query. Please try again later.');
+                }
+            });
+        });   
+    </script>
     
 </body>
 </html>
