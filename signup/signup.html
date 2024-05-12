@@ -27,12 +27,13 @@
      
     <div class="wrapper">
         <h1>Sign Up</h1>
-        <form action="">
-            <input type="text" placeholder="Enter username">
-            <input type="email" placeholder="Enter email">
-            <input type="password" placeholder="Enter password">
-            <input type="password" placeholder="Confirm password">
-        </form>
+        <form id="signup-form">
+            <input type="text" id="username" placeholder="Enter username">
+            <input type="email" id="email" placeholder="Enter email">
+            <input type="password" id="password" placeholder="Enter password">
+            <input type="password" id="confirm-password" placeholder="Confirm password">
+            <div id="error-messages"></div>
+        
         <div class="terms">
             <input type="checkbox" id="checkbox">
             <label for="checkbox">I agree to these<a href="#">Terms & conditions</a></label>
@@ -41,6 +42,7 @@
         <div class="member">
             Already have an account? <a href="/login/login.html">Login here</a>
         </div>
+    </form>
     </div>
 
 
@@ -48,6 +50,84 @@
         <p>Developed by Philbert Muhire &copy; 2024</p>
     </div>
     <a href="#" class="top"><i class='bx bx-up-arrow-alt'></i></a>
+
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', async (event) => {
+            event.preventDefault(); 
+        
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+        
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+        
+            if (!isValidPassword(password)) {
+                showError('Password must contain at least one uppercase letter, one lowercase letter, one symbol, one number, and be at least 8 characters long.');
+                return;
+            }
+        
+            if (password !== confirmPassword) {
+                showError('Passwords do not match.');
+                return;
+            }
+        
+            try {
+                const response = await fetch('http://localhost:5000/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+        
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(data.message); 
+                    window.location.href = '/login/login.html';
+                } else {
+                    const errorData = await response.json();
+                    showError(errorData.message);
+                }
+            } catch (error) {
+                showError('Error: Registration failed');
+                console.error(error);
+            }
+        });
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function isValidPassword(password) {
+            const uppercaseRegex = /[A-Z]/;
+            const lowercaseRegex = /[a-z]/;
+            const symbolRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+            const numberRegex = /[0-9]/;
+        
+            return (
+                password.length >= 8 &&
+                uppercaseRegex.test(password) &&
+                lowercaseRegex.test(password) &&
+                symbolRegex.test(password) &&
+                numberRegex.test(password)
+            );
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-messages');
+            errorDiv.innerHTML = `<p>${message}</p>`;
+        }
+        
+    </script>
 
     
 </body>
