@@ -132,22 +132,59 @@
                     </tr>
                 </thead>
 
-                <tbody>
-                    <tr>
-                        <td>Philimuhire</td>
-                        <td>philimuhire@gmail.com</td>
-                        <td><span class="action">Delete User</span></td>
-                    </tr>
+                <tbody id="userTableBody">
 
-                    <tr>
-                        <td>Grace</td>
-                        <td>grace@gmail.com</td>
-                        <td><span class="action">Delete User</span></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const userTableBody = document.getElementById('userTableBody');
+        
+        try {
+            const response = await fetch('http://localhost:5000/auth/allusers');
+            const users = await response.json();
+    
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td><button class="action" data-user-email="${user.email}">Delete User</button></td>
+                `;
+                userTableBody.appendChild(row);
+            });
+
+            const deleteButtons = document.querySelectorAll('.action');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async function () {
+                    const userEmail = button.getAttribute('data-user-email');
+                    if (confirm(`Are you sure you want to delete the user with email ${userEmail}?`)) {
+                        try {
+                            const response = await fetch(`http://localhost:5000/auth/delete/${userEmail}`, {
+                                method: 'DELETE'
+                            });
+                            if (response.ok) {
+                                button.closest('tr').remove();
+                                alert('User deleted successfully');
+                            } else {
+                                const data = await response.json();
+                                alert(data.message);
+                            }
+                        } catch (error) {
+                            console.error('Error deleting user:', error);
+                            alert('Error deleting user. Please try again.');
+                        }
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    });
+</script>
 
 </html>
