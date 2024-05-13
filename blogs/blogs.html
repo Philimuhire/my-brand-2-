@@ -31,30 +31,8 @@
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Adipisci temporibus fuga libero doloremque praesentium beatae.</p>
             </div>
-            <div class="content">
-                <div class="card">
-                    <img src="/images/blog1.jpeg" alt="">
-                    <h4>My journey into ATLP</h4>
-                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Qui, 
-                        laboriosam deleniti temporibus maxime fugit explicabo in quis ipsam minus dignissimos nam. 
-                        Praesentium, ullam laudantium consequuntur optio aperiam quo mollitia veniam, quam in </p>
-                    <a href="#" class="more-link">Read more</a>
-                </div>
-                <div class="card">
-                    <img src="/images/blog2.jpeg" alt="">
-                    <h4>My journey into software development</h4>
-                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Qui, 
-                        laboriosam deleniti temporibus maxime fugit explicabo in quis ipsam minus dignissimos nam. 
-                        distinctio sint eveniet.</p>
-                    <a href="#" class="more-link">Read more</a>
-                </div>
-                <div class="card">
-                    <img src="/images/blog3.jpg" alt="">
-                    <h4>Ways to reach your goals</h4>
-                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Qui, 
-                        laboriosam deleniti temporibus maxime fugit explicabo in quis ipsam minus dignissimos nam. </p>
-                    <a href="#" class="more-link">Read more</a>
-                </div>
+            <div class="content" id="blogList">
+                
             </div>
         </div>
     </div>
@@ -63,6 +41,31 @@
         <p>Developed by Philbert Muhire &copy; 2024</p>
     </div>
     <a href="#" class="top"><i class='bx bx-up-arrow-alt'></i></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const blogList = document.getElementById('blogList');
+
+            try {
+                const response = await fetch('http://localhost:5000/blog/getAllBlogs');
+                const blogs = await response.json();
+
+                blogs.forEach(blog => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.innerHTML = `
+                        <img src="${blog.image}" alt="${blog.title}">
+                        <h4>${blog.title}</h4>
+                        <p>${blog.content}</p>
+                        <a href="#" class="more-link">Read more</a>
+                    `;
+                    blogList.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching blogs:', error);
+            }
+        });
+    </script>
     
 </body>
 </html>
