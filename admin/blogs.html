@@ -95,21 +95,21 @@
             <div class="cardBox">
                 <div class="card">
                     <div>
-                        <div class="numbers">10</div>
+                        <div class="numbers" id="usersCount"></div>
                         <div class="cardName">Users</div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div>
-                        <div class="numbers">15</div>
+                        <div class="numbers" id="messagesCount"></div>
                         <div class="cardName">Messages</div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div>
-                        <div class="numbers">5</div>
+                        <div class="numbers" id="blogsCount"></div>
                         <div class="cardName">Blog posts</div>
                     </div>
                 </div>
@@ -121,34 +121,83 @@
             <button class="add-btn">Add New Blog</button>
         </div>
     </div> 
-</body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const blogContainer = document.getElementById('blogContainer');
+
+            try {
+                const response = await fetch('http://localhost:5000/blog/getAllBlogs');
+                const blogs = await response.json();
+
+                blogs.forEach(blog => {
+                    const blogDiv = document.createElement('div');
+                    blogDiv.classList.add('blog');
+                    blogDiv.innerHTML = `
+                        <h2>${blog.title}</h2>
+                        <img src="${blog.image}" alt="${blog.title}">
+                        <p>${blog.content}</p>
+                        <div class="actions">
+                            <button class="update-btn">Update</button>
+                            <button class="delete-btn" data-id="${blog._id}">Delete</button>
+                        </div>
+                    `;
+                    blogContainer.appendChild(blogDiv);
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const blogId = e.target.getAttribute('data-id');
+                        if (confirm('Are you sure you want to delete this blog?')) {
+                            try {
+                                const response = await fetch(`http://localhost:5000/blog/deleteBlog/${blogId}`, {
+                                    method: 'DELETE'
+                                });
+                                const result = await response.json();
+                                if (response.ok) {
+                                    e.target.closest('.blog').remove();
+                                    alert(result.message);
+                                } else {
+                                    alert(result.message);
+                                }
+                            } catch (error) {
+                                console.error('Error deleting blog:', error);
+                                alert('Failed to delete blog.');
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error fetching blogs:', error);
+            }
+        });
+    </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', async function () {
-        const blogContainer = document.getElementById('blogContainer');
-
+    async function fetchCount(url, elementId) {
         try {
-            const response = await fetch('http://localhost:5000/blog/getAllBlogs');
-            const blogs = await response.json();
+            console.log(`Fetching count from ${url}`); 
+            const response = await fetch(url);
+            const data = await response.json();
+            console.log(`Data received for ${elementId}:`, data); 
 
-            blogs.forEach(blog => {
-                const blogDiv = document.createElement('div');
-                blogDiv.classList.add('blog');
-                blogDiv.innerHTML = `
-                    <h2>${blog.title}</h2>
-                    <img src="${blog.image}" alt="${blog.title}">
-                    <p>${blog.content}</p>
-                    <div class="actions">
-                        <button class="update-btn">Update</button>
-                        <button class="delete-btn">Delete</button>
-                    </div>
-                `;
-                blogContainer.appendChild(blogDiv);
-            });
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = data.count;
+            } else {
+                console.error(`Element with ID ${elementId} not found`);
+            }
         } catch (error) {
-            console.error('Error fetching blogs:', error);
+            console.error("Error fetching count:", error);
         }
-    });
+    }
+
+   
+    fetchCount('http://localhost:5000/auth/userscount', 'usersCount');
+    fetchCount('http://localhost:5000/contact/queryCount', 'messagesCount');
+    fetchCount('http://localhost:5000/blog/blogsCount', 'blogsCount');
 </script>
 
+</body>
 </html>
