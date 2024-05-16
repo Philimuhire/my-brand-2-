@@ -58,7 +58,7 @@
                     card.innerHTML = `
                         <img src="${blog.image}" alt="${blog.title}">
                         <h4>${blog.title}</h4>
-                        <a href="#" class="more-link">Read more</a>
+                        <a href="/blogs/blog${blog._id}.html" class="more-link">Read more</a>
                     `;
                     blogList.appendChild(card);
                 });

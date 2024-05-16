@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHILBERT | MY BRAND</title>
+    <link rel="stylesheet" href="/blogs/blog6644422a6a01fee6b87cc93f.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+</head>
+<body>
+    <header class="header">
+        <a href="#" class="logo">PHILBERT MUHIRE</a>
+        <nav class="navbar">
+            <a href="/homepage/index.html">Home</a>
+            <a href="/about/about.html">About Me</a>
+            <a href="/services/services.html">Services</a>
+            <a href="/skills/skills.html">Skills</a>
+            <a href="/portfolio/portfolio.html">Portfolio</a>
+            <a href="/blogs/blogs.html">My Blog</a>
+            <a href="/contact/contact.html">Contact Me</a>
+            <a href="/login/login.html">Login</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1 id="blogTitle"></h1>
+        <div class="blog-image">
+            <img src="" alt="" id="blogImage">
+        </div>
+        <div class="blog-content" id="blogContent">
+
+        </div>
+        <div class="reactions">
+            <i class='bx bxs-like' id="likeButton" style='color:#00eeff'></i>
+            <span id="likeCount" style="font-size: 14px;"></span><span style="font-size: 14px;">likes</span>
+            <i class='bx bxs-message-rounded-dots' id="commentIcon" style='color:#00eeff'></i>
+            <span id="commentCount" style="font-size: 14px;"></span><span style="font-size: 14px;">comments</span>
+            <i class='bx bxs-share' style='color:#00eeff'></i>
+        </div>
+
+        <form id="commentForm" style="display: none;">
+            <input type="text" id="commentInput" placeholder="Write a comment...">
+            <button type="submit">Comment</button>
+        </form>
+
+        <a href="/blogs/blogs.html" class="back-link">Go Back</a>
+
+    </div>
+
+    <div class="last-text">
+        <p>Developed by Philbert Muhire &copy; 2024</p>
+    </div>
+
+    <a href="#" class="top"><i class='bx bx-up-arrow-alt'></i></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                const response = await fetch('http://localhost:5000/blog/getBlogById/6644422a6a01fee6b87cc93f'); 
+                const blog = await response.json();
+        
+                document.getElementById('blogTitle').textContent = blog.title;
+                document.getElementById('blogImage').src = blog.image;
+                document.getElementById('blogContent').textContent = blog.content;
+        
+                document.getElementById('likeCount').textContent = blog.likes;
+                document.getElementById('commentCount').textContent = blog.comments.length;
+            } catch (error) {
+                console.error('Error fetching blog:', error);
+            }
+        
+            const likeButton = document.getElementById('likeButton');
+            likeButton.addEventListener('click', async function () {
+                try {
+                    const response = await fetch(`http://localhost:5000/blog/addLike/6644422a6a01fee6b87cc93f`, {
+                        method: 'POST',
+                    });
+                    const data = await response.json();
+                    console.log(data); 
+                } catch (error) {
+                    console.error('Error liking blog:', error);
+                }
+            });
+        
+            const commentIcon = document.getElementById('commentIcon');
+            const commentForm = document.getElementById('commentForm');
+            commentIcon.addEventListener('click', function () {
+                commentForm.style.display = commentForm.style.display === 'none' ? 'block' : 'none';
+            });
+        
+            const commentInput = document.getElementById('commentInput');
+            commentForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const comment = commentInput.value;
+                try {
+                    const response = await fetch(`http://localhost:5000/blog/addComment/6644422a6a01fee6b87cc93f`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ comment }),
+                    });
+                    const data = await response.json();
+                    console.log(data); 
+                    commentInput.value = ''; 
+                    commentForm.style.display = 'none'; 
+                } catch (error) {
+                    console.error('Error adding comment:', error);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
